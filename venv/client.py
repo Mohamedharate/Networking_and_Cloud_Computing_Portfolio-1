@@ -1,14 +1,22 @@
 import socket, sys, random
 
+bots = ["quotes", "bob", "dora", "chuck"]
+
+if sys.argv[1] == "--help" or sys.argv[1] == "-h":
+    print(f"You have to write in the following format:\npython client.py YOUR-IP-ADDRESS YOUR-PORT BOT_NAME"
+          f"\nThis is a list of our bots:\n{str(bots)}")
+    exit()
+
 IP = sys.argv[1]
 PORT = int(sys.argv[2])
 BOT = sys.argv[3]
-
 RECV_BUFFER = 4096
 
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+if BOT not in bots:
+    print(f"No bot with name {BOT} found\nThis is a list of our bots:\n{str(bots)}")
+    exit()
 
-print('Waiting for connection response')
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
     client_socket.connect((IP, PORT))
@@ -17,25 +25,39 @@ try:
 except socket.error as e:
     print(str(e))
 
-bots = ["alice", "bob", "dora", "chuck"]
+print('Waiting for connection response')
 
-found = False
+def quotes(a, b = None):
 
-def findbot(bot):
-    for b in bots:
-        if bot == b:
-            found = True
-            break
+    wordsInArray = a.split()
 
-    if found:
-        return True
-    else:
-        return False
-        #f"No bot with name {bot} found"
+    ACTIONS = {
+        ("hey","hello","hi"):["Hey there!","Hey!","Hey beauty!"],
+        ("sup","zup","what's up","what is up","how are you","how r u"):["Just chilling!","I am talking to you!","Just about to sleep"],
+        ('eat','hungry','meal','bite','snack',"dinner"): ["All you do is eating!","You have eaten too much already!","Bon aptit!"],
+        ('help',''): ["Ask Google!","Sorry, I can't help you!","I am here to help you!"],
+        ('code','coding','programming'): ["fuck coding","shut up","I love coding"],
+        ('joke','wqeqweq'): ["fd"],
+        ('sleep','ewe'): ["ddf"],
+        ('sing','ewe'): ["ddf"],
+        ('dwin','qweqe'): ["fffff"]
+    }
 
+    found = False
+    for keysList in ACTIONS:
+        for key in keysList:
+            for word in wordsInArray:
+                if key.__eq__(word.lower()):
+                    found = True
+                    ress1 = ACTIONS[keysList]
+                    ress = (random.choice(ress1))
+                    break
 
-def alice(a, b = None):
- return "I think {} sounds great!".format(a + "ing")
+    if not found:
+        ress1 = random.choice(list(ACTIONS.values()))
+        ress = (random.choice(ress1))
+
+    return str(ress)
 
 def bob(a, b = None):
  if b is None:
@@ -58,7 +80,6 @@ def chuck(a, b = None):
     return "What? {} sucks. Not doing that.".format(action)
  return "I don't care!"
 
-
 def customerservice(a, b=None):
     if b is None:
         uselessness = random.choice(["Sorry, I can't help you with {}.".format(a + "ing"),
@@ -68,7 +89,6 @@ def customerservice(a, b=None):
     uselessness = random.choice(["Do you need help with {} or {}?".format(a + "ing", b + "ing")])
     return uselessness
 
-
 while True:
 
     disconnect = f"bye {BOT}"
@@ -77,12 +97,9 @@ while True:
     if res.decode().lower() == disconnect:
         client_socket.close()
 
-
-
     if res:
         print("Host: " + res.decode('utf-8'))
 
-    if findbot(BOT):
-        send = eval(BOT + "(res.decode())")
+    sendMSG = eval(BOT + "(res.decode())")
 
-    client_socket.send(send.encode())
+    client_socket.send(sendMSG.encode())

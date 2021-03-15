@@ -17,15 +17,12 @@ except socket.error as e:
 print('Socket is listening..')
 server_socket.listen(5)
 
-
 class Client_class():
     def __init__(self, username, user_socket):
         self.username = username
         self.user_socket = user_socket
 
-
 clientsArray = []
-
 
 def multi_threaded_client(connection, user):
     while True:
@@ -43,15 +40,11 @@ def multi_threaded_client(connection, user):
         for one_client in clientsArray:
             try:
                 data = one_client.user_socket.recv(RECV_BUFFER)
-
-                # if one_client.user_socket != connection:
-                #   one_client.user_socket.send(one_client.username.upper() + ": " + data)
                 if data:
                     print(f"{one_client.username.upper()}: " + data.decode())
             except:
                 print(one_client.username.upper() + " disconnected!\n")
                 clientsArray.remove(one_client)
-
 
 while True:
     client_socket, address = server_socket.accept()
