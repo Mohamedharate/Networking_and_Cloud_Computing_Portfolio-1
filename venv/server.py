@@ -24,27 +24,75 @@ class Client_class():
 
 clientsArray = []
 
-def multi_threaded_client(connection, user):
+'''
+def sendData():
     while True:
-
-        msg_to_clients = input('Me: ')
+        msg_to_clients = input('')
         for one_client in clientsArray:
             try:
-                if one_client.user_socket:
-                    one_client.user_socket.send(str.encode(msg_to_clients))
+                one_client.user_socket.send(str.encode(msg_to_clients))
 
             except:
                 print(one_client.username.upper() + " disconnected!\n")
                 clientsArray.remove(one_client)
+                one_client.user_socket.close()
 
+def reciveData():
+    while True:
         for one_client in clientsArray:
             try:
                 data = one_client.user_socket.recv(RECV_BUFFER)
+
                 if data:
                     print(f"{one_client.username.upper()}: " + data.decode())
             except:
                 print(one_client.username.upper() + " disconnected!\n")
                 clientsArray.remove(one_client)
+                one_client.user_socket.close()
+
+'''
+
+def multi_threaded_client(connection, user):
+
+
+    while True:
+
+
+        msg_to_clients = input()
+        for one_client in clientsArray:
+            try:
+
+                one_client.user_socket.send(str.encode("host"))
+                one_client.user_socket.send(str.encode("host: " + msg_to_clients))
+
+            except:
+                print(one_client.username.upper() + " disconnected!\n")
+                clientsArray.remove(one_client)
+                one_client.user_socket.close()
+
+
+        for one_client in clientsArray:
+            try:
+                data = one_client.user_socket.recv(RECV_BUFFER)
+
+                if data:
+                    print(f"{one_client.username.upper()}: " + data.decode())
+                    broadcast(one_client,data)
+
+            except:
+                print(one_client.username.upper() + " disconnected!\n")
+                clientsArray.remove(one_client)
+                one_client.user_socket.close()
+
+
+def broadcast(client, msg):
+    for bot in clientsArray:
+        try:
+            if bot.user_socket != client.user_socket:
+                bot.user_socket.send(str.encode(client.username + ": ") + msg)
+        except:
+            clientsArray.remove(bot)
+
 
 while True:
     client_socket, address = server_socket.accept()

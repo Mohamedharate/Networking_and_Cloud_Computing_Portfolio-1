@@ -1,9 +1,15 @@
 import socket, sys, random
+from datetime import date
+import re
+from datetime import datetime
 
-bots = ["quotes", "bob", "dora", "chuck"]
 
-if sys.argv[1] == "--help" or sys.argv[1] == "-h":
-    print(f"You have to write in the following format:\npython client.py YOUR-IP-ADDRESS YOUR-PORT BOT_NAME"
+
+bots = ["alice", "bob", "dora", "chuck","customerservice"]
+
+if sys.argv[1] == "--help" or sys.argv[1] == "-h" or sys.argv[3] == ' ':
+    print(f"You have to write in the following format:\npython client.py"
+          f" YOUR-IP-ADDRESS YOUR-PORT BOT_NAME"
           f"\nThis is a list of our bots:\n{str(bots)}")
     exit()
 
@@ -27,31 +33,33 @@ except socket.error as e:
 
 print('Waiting for connection response')
 
-def quotes(a, b = None):
-
-    wordsInArray = a.split()
+def alice(wordsInArray, b = None):
 
     ACTIONS = {
-        ("hey","hello","hi"):["Hey there!","Hey!","Hey beauty!"],
-        ("sup","zup","what's up","what is up","how are you","how r u"):["Just chilling!","I am talking to you!","Just about to sleep"],
+        ('hey','hello','hi'):["Hey there!","Hey!","Hey beauty!"],
+        ('sup','zup','how r u'):["Just chilling!","I am talking to you!","Just about to sleep"],
         ('eat','hungry','meal','bite','snack',"dinner"): ["All you do is eating!","You have eaten too much already!","Bon aptit!"],
-        ('help',''): ["Ask Google!","Sorry, I can't help you!","I am here to help you!"],
-        ('code','coding','programming'): ["fuck coding","shut up","I love coding"],
-        ('joke','wqeqweq'): ["fd"],
-        ('sleep','ewe'): ["ddf"],
-        ('sing','ewe'): ["ddf"],
-        ('dwin','qweqe'): ["fffff"]
+        ('help','helping'): ["Ask Google!","Sorry, I can't help you!","I am here to help you!"],
+        ('code','coding','programming'): ["fuck coding","shut up","I love coding","I hate coding"],
+        ('joke','joking'): ["I don't like joking","sdf"],
+        ('sleep','ewe'): ["ddf","dfs"],
+        ('sing','ewe'): ["ddf","fdsf","fds"],
+        ('bye','byee'): ["oh noo","Byee :/"],
+        ('dwin','qweqe'): ["fffff","dsfs","sdfs","sdf"]
     }
+
 
     found = False
     for keysList in ACTIONS:
+
         for key in keysList:
+
             for word in wordsInArray:
-                if key.__eq__(word.lower()):
+
+                if word == key:
                     found = True
                     ress1 = ACTIONS[keysList]
                     ress = (random.choice(ress1))
-                    break
 
     if not found:
         ress1 = random.choice(list(ACTIONS.values()))
@@ -59,7 +67,51 @@ def quotes(a, b = None):
 
     return str(ress)
 
-def bob(a, b = None):
+
+def bob(wordsInArray, b = None):
+
+    ACTIONS = {
+        ('hey', 'hello', 'hi'): ["Hey there!", "Hey!", "Hey beauty!"],
+        ('sup', 'zup'): ["Just chilling!", "I am talking to you!", "Just about to sleep"],
+        ('eat', 'hungry', 'meal', 'bite', 'snack', "dinner"): ["All you do is eating!",
+                                                               "You have eaten too much already!", "Bon aptit!"],
+        ('help', 'helping'): ["Ask Google!", "Sorry, I can't help you!", "I am here to help you!"],
+        ('code', 'coding', 'programming'): ["fuck coding", "shut up", "I love coding", "I hate coding"],
+        ('joke', 'joking','jokes'):
+            ["I don't like joking",
+            "What did the fish say when he swam into a wall?\nDam.",
+            "while (mahself.stillAwake())\n{\n   sleep++;\n}","What do you call when computer sience majors make fun of each other?\nCyber boolean!"
+            "Prgramming is like writing a book..\nExcept when you miss a single comma on page 126 the whole thing makes no sense",
+            "My dog ate my computer science project\nyour dog ate your coding assignment?\nIt took him a couple bytes",
+            "I don't like computer science jokes...\nNot one bit.",
+            "One thing I know is that a computer science major didn't name the original pokemon.\nOtherwise, charmander would evolve into stringmander.",
+            "Why are people who use the metric system so good at computer science?\nBecause they are pro-grammers.",
+            "I'm teaching my white blood cells math and my red blood cells computer science\nOnce they become STEM cells I am hoping to regrow a finger.",
+            "I would talk about computer science...\nBut it makes my mother board"],
+        ('day', 'date'): [f"Today's date: {date.today()}","we"],
+        ('time', 'ewe'): [f"Time is: {datetime.now()}", "we", "we"],
+        ('who', 'whoami'): [f"I am {BOT}!", "dsfs", "sdfs", "sdf"]
+    }
+
+    found = False
+    for keysList in ACTIONS:
+
+        for key in keysList:
+
+            for word in wordsInArray:
+
+                if word == key:
+                    found = True
+                    ress1 = ACTIONS[keysList]
+                    ress = (random.choice(ress1))
+
+    if not found:
+        ress1 = random.choice(list(ACTIONS.values()))
+        ress = (random.choice(ress1))
+
+    return str(ress)
+
+    '''
  if b is None:
     return "Not sure about {}. Don't I get a choice?".format(a + "ing")
  return "Sure, both {} and {} seems ok to me".format(a, b + "ing")
@@ -68,7 +120,8 @@ def dora(a):
  alternatives = ["coding", "singing", "sleeping", "fighting"]
  b = random.choice(alternatives)
  res = "Yea, {} is an option. Or we could do some {}.".format(a, b)
- return res
+ return str(res)
+ '''
 
 def chuck(a, b = None):
  action = a + "ing"
@@ -92,14 +145,24 @@ def customerservice(a, b=None):
 while True:
 
     disconnect = f"bye {BOT}"
-    res = client_socket.recv(RECV_BUFFER)
+    MSG_FROM_SERVER = client_socket.recv(RECV_BUFFER).decode('utf-8').lower()
 
-    if res.decode().lower() == disconnect:
-        client_socket.close()
+    if MSG_FROM_SERVER == "host":
+        MSG_FROM_SERVER = client_socket.recv(RECV_BUFFER).decode('utf-8').lower()
 
-    if res:
-        print("Host: " + res.decode('utf-8'))
+        if MSG_FROM_SERVER == disconnect:
+            client_socket.close()
 
-    sendMSG = eval(BOT + "(res.decode())")
+        if MSG_FROM_SERVER:
+            print(MSG_FROM_SERVER.upper())
 
-    client_socket.send(sendMSG.encode())
+        MSG_FROM_SERVER = re.sub("[^A-Za-z]+"," ",MSG_FROM_SERVER).lower()
+
+        wordsInArray = MSG_FROM_SERVER.split()
+
+        sendMSG = eval(BOT + "(wordsInArray)")
+
+        client_socket.send(sendMSG.encode())
+        print("ME: " + sendMSG)
+    else:
+        print((MSG_FROM_SERVER).upper())
