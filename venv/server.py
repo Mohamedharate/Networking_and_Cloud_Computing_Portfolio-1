@@ -24,65 +24,33 @@ class Client_class():
 
 clientsArray = []
 
-'''
-def sendData():
-    while True:
-        msg_to_clients = input('')
-        for one_client in clientsArray:
-            try:
-                one_client.user_socket.send(str.encode(msg_to_clients))
-
-            except:
-                print(one_client.username.upper() + " disconnected!\n")
-                clientsArray.remove(one_client)
-                one_client.user_socket.close()
-
-def reciveData():
-    while True:
-        for one_client in clientsArray:
-            try:
-                data = one_client.user_socket.recv(RECV_BUFFER)
-
-                if data:
-                    print(f"{one_client.username.upper()}: " + data.decode())
-            except:
-                print(one_client.username.upper() + " disconnected!\n")
-                clientsArray.remove(one_client)
-                one_client.user_socket.close()
-
-'''
-
 def multi_threaded_client(connection, user):
 
-
     while True:
-
-
         msg_to_clients = input()
         for one_client in clientsArray:
             try:
-
                 one_client.user_socket.send(str.encode("host"))
                 one_client.user_socket.send(str.encode("host: " + msg_to_clients))
 
             except:
-                print(one_client.username.upper() + " disconnected!\n")
                 clientsArray.remove(one_client)
                 one_client.user_socket.close()
-
+                print(one_client.username.upper() + " disconnected!\n")
+                continue
 
         for one_client in clientsArray:
             try:
                 data = one_client.user_socket.recv(RECV_BUFFER)
-
                 if data:
                     print(f"{one_client.username.upper()}: " + data.decode())
                     broadcast(one_client,data)
 
             except:
-                print(one_client.username.upper() + " disconnected!\n")
                 clientsArray.remove(one_client)
                 one_client.user_socket.close()
+                print(one_client.username.upper() + " disconnected!\n")
+                continue
 
 
 def broadcast(client, msg):
@@ -91,15 +59,14 @@ def broadcast(client, msg):
             if bot.user_socket != client.user_socket:
                 bot.user_socket.send(str.encode(client.username + ": ") + msg)
         except:
+            print(one_client.username.upper() + " disconnected!\n")
             clientsArray.remove(bot)
-
 
 while True:
     client_socket, address = server_socket.accept()
     user = client_socket.recv(RECV_BUFFER).decode()
     clientsArray.append(Client_class(user, client_socket))
     print(f'{user.upper()} is connected with IP address ' + address[0] + ', and Port: ' + str(address[1]))
-
     start_new_thread(multi_threaded_client, (client_socket, user))
 
 server_socket.close()
